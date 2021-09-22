@@ -22,6 +22,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.leanback.widget.BaseCardView;
 import androidx.leanback.widget.ImageCardView;
@@ -36,6 +37,7 @@ import java.net.URL;
 
 import ir.netbox.audition.Models.Card;
 import ir.netbox.audition.Models.Movie;
+import ir.netbox.audition.Presenters.DataPresenters.DownloadImageTask;
 
 class CardPresenter<T extends BaseCardView> extends Presenter {
 
@@ -43,6 +45,7 @@ class CardPresenter<T extends BaseCardView> extends Presenter {
     private final Context mContext;
     String imageURL;
     Drawable downloaded_image;
+    DownloadImageTask downloadImageTask;
 
     public CardPresenter(Context context) {
         mContext = context;
@@ -69,45 +72,16 @@ class CardPresenter<T extends BaseCardView> extends Presenter {
 
         ImageCardView imageCardView = (ImageCardView) viewHolder.view;
         //imageCardView.setMainImage(movie.getImage());
-//        imageURL = movie.getPosterAddress();
-//        imageCardView.setMainImage(downloaded_image);
+        imageURL = movie.getPosterAddress();
+        downloadImageTask=new DownloadImageTask(getContext(),imageCardView,imageURL);
+        downloadImageTask.loadImage();
+
+
+
+        //imageCardView.setMainImage(downloaded_image);
         imageCardView.setMainImageDimensions(313, 176);
         imageCardView.setTitleText(movie.getTitle());
         imageCardView.setContentText("more information...");
-    }
-
-    private void startImageThread(){
-        new Thread(){
-            @Override
-            public void run() {
-                super.run();
-                loadPoster();
-            }
-        }.start();
-    }
-    private void loadPoster() {
-
-            Bitmap x=null;
-
-                HttpURLConnection connection;
-                try {
-
-                    URL url=new URL(imageURL);
-
-                    connection = (HttpURLConnection) url.openConnection();
-
-                    InputStream input = connection.getInputStream();
-
-                    x = BitmapFactory.decodeStream(input);
-
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                }
-
-
-
-
-        downloaded_image= new BitmapDrawable(Resources.getSystem(), x);
     }
 
 
